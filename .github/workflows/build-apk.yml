@@ -2,9 +2,7 @@ name: Build Android APK
 
 on:
   push:
-    branches: [ "main", "master" ]
-  pull_request:
-    branches: [ "main", "master" ]
+    branches: [ "main" ]
   workflow_dispatch:
 
 jobs:
@@ -14,6 +12,22 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+
+      - name: Extract Project Files
+        run: |
+          if [ -f "CN-Upscaler-GitHub-Ready.zip" ]; then
+            unzip -o CN-Upscaler-GitHub-Ready.zip
+          elif [ -f "cnupscaler.zip" ]; then
+            unzip -o cnupscaler.zip
+          fi
+          
+          if [ -d "cnupscaler" ]; then
+            cp -rf cnupscaler/* .
+            cp -rf cnupscaler/.* . 2>/dev/null || true
+          fi
+          
+          echo "sdk.dir=$ANDROID_HOME" > local.properties
+          ls -la
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
