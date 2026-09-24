@@ -19,8 +19,9 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
-    - name: Setup Android SDK
-      uses: android-actions/setup-android@v3
+    - name: Accept Android Licenses
+      run: |
+        yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
 
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v3
@@ -33,9 +34,9 @@ jobs:
         if [ -z "$PROJECT_DIR" ]; then
           PROJECT_DIR="."
         fi
-        echo "Found project directory: $PROJECT_DIR"
+        echo "Building in: $PROJECT_DIR"
         cd "$PROJECT_DIR"
-        gradle assembleDebug --no-daemon --warning-mode all
+        gradle assembleDebug --no-daemon
 
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
