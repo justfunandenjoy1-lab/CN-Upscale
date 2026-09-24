@@ -45,6 +45,11 @@ jobs:
 
         echo "Building inside directory: $PROJECT_DIR"
         cd "$PROJECT_DIR"
+
+        # AndroidX সক্রিয় করতে gradle.properties এ ফ্ল্যাগ যোগ করা
+        echo "android.useAndroidX=true" >> gradle.properties
+        echo "android.enableJetifier=true" >> gradle.properties
+
         gradle assembleDebug --no-daemon
 
     - name: Upload APK Artifact
