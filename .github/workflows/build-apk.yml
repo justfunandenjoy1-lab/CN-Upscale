@@ -13,10 +13,10 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Set up JDK 17
+    - name: Set up JDK 11
       uses: actions/setup-java@v4
       with:
-        java-version: '17'
+        java-version: '11'
         distribution: 'temurin'
 
     - name: Accept Android Licenses
@@ -26,25 +26,20 @@ jobs:
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v3
       with:
-        gradle-version: '8.2'
+        gradle-version: '7.5'
 
-    - name: Locate and Build Debug APK
+    - name: Build Debug APK
       run: |
-        echo "Searching for settings.gradle or build.gradle..."
-        TARGET_DIR=$(find . -name "settings.gradle*" -exec dirname {} \; | head -n 1)
-        
-        if [ -z "$TARGET_DIR" ]; then
-          TARGET_DIR=$(find . -name "build.gradle*" -not -path "*/app/*" -exec dirname {} \; | head -n 1)
-        fi
-
+        # settings.gradle অথবা build.gradle যেখানে আছে সেই ফোল্ডারে যাওয়া
+        TARGET_DIR=$(find . -name "settings.gradle" -o -name "settings.gradle.kts" | head -n 1 | xargs dirname)
         if [ -z "$TARGET_DIR" ]; then
           TARGET_DIR="."
         fi
-
-        echo "Switching to directory: $TARGET_DIR"
+        echo "Moving into: $TARGET_DIR"
         cd "$TARGET_DIR"
-        ls -la
-        gradle assembleDebug --no-daemon --stacktrace
+        
+        # বিল্ড কমান্ড
+        gradle assembleDebug --no-daemon
 
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
