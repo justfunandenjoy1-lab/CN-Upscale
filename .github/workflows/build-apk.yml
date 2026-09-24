@@ -1,51 +1,20 @@
-name: Build Android APK
+# প্রজেক্ট ফোল্ডারে প্রবেশ করুন
+cd cnupscaler
 
-on:
-  push:
-    branches: [ "main" ]
-  workflow_dispatch:
+# গিট ইনিশিয়ালাইজ করুন (না করা থাকলে)
+git init
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
+# ফাইলগুলো স্টেজিং এরিয়াতে যোগ করুন
+git add .
 
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+# পরিবর্তনগুলো কমিট করুন
+git commit -m "Setup project and APK build workflow"
 
-      - name: Extract Project Files
-        run: |
-          if [ -f "CN-Upscaler-GitHub-Ready.zip" ]; then
-            unzip -o CN-Upscaler-GitHub-Ready.zip
-          elif [ -f "cnupscaler.zip" ]; then
-            unzip -o cnupscaler.zip
-          fi
-          
-          if [ -d "cnupscaler" ]; then
-            cp -rf cnupscaler/* .
-            cp -rf cnupscaler/.* . 2>/dev/null || true
-          fi
-          
-          echo "sdk.dir=$ANDROID_HOME" > local.properties
-          ls -la
+# গিটহাব রিপোজিটরির মেইন ব্রাঞ্চ সেট করুন
+git branch -M main
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: '17'
+# আপনার গিটহাব রিপোজিটরির লিংক যোগ করুন (YOUR_USERNAME এবং REPO_NAME পরিবর্তন করুন)
+git remote add origin https://github.com/YOUR_USERNAME/REPO_NAME.git
 
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: '8.7'
-
-      - name: Build Debug APK
-        run: gradle assembleDebug --stacktrace
-
-      - name: Upload Debug APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: cnupscaler-debug-apk
-          path: app/build/outputs/apk/debug/*.apk
-          retention-days: 14
+# গিটহাবে পুশ করুন
+git push -u origin main
