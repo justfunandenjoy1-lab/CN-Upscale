@@ -26,11 +26,10 @@ jobs:
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v3
       with:
-        gradle-version: '8.2'
+        gradle-version: '8.7'
 
     - name: Extract Project Zip and Build
       run: |
-        # জিপ ফাইল আনজিপ করা
         if [ -f "CN-Upscaler.zip" ]; then
           echo "Extracting CN-Upscaler.zip..."
           unzip -o CN-Upscaler.zip
@@ -39,7 +38,6 @@ jobs:
           unzip -o cnupscaler.zip
         fi
 
-        # যেখানে settings.gradle বা build.gradle আছে সেই ফোল্ডার খুঁজে নেওয়া
         PROJECT_DIR=$(find . -name "settings.gradle*" -exec dirname {} \; | head -n 1)
         if [ -z "$PROJECT_DIR" ]; then
           PROJECT_DIR=$(find . -name "build.gradle*" -not -path "*/app/*" -exec dirname {} \; | head -n 1)
