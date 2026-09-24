@@ -28,15 +28,23 @@ jobs:
       with:
         gradle-version: '8.2'
 
-    - name: Build Debug APK
+    - name: Locate and Build Debug APK
       run: |
-        PROJECT_DIR=$(find . -name "build.gradle*" -not -path "*/app/*" -exec dirname {} \; | head -n 1)
-        if [ -z "$PROJECT_DIR" ]; then
-          PROJECT_DIR="."
+        echo "Searching for settings.gradle or build.gradle..."
+        TARGET_DIR=$(find . -name "settings.gradle*" -exec dirname {} \; | head -n 1)
+        
+        if [ -z "$TARGET_DIR" ]; then
+          TARGET_DIR=$(find . -name "build.gradle*" -not -path "*/app/*" -exec dirname {} \; | head -n 1)
         fi
-        echo "Building in: $PROJECT_DIR"
-        cd "$PROJECT_DIR"
-        gradle assembleDebug --no-daemon
+
+        if [ -z "$TARGET_DIR" ]; then
+          TARGET_DIR="."
+        fi
+
+        echo "Switching to directory: $TARGET_DIR"
+        cd "$TARGET_DIR"
+        ls -la
+        gradle assembleDebug --no-daemon --stacktrace
 
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
