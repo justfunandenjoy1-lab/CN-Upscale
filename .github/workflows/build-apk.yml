@@ -1,20 +1,33 @@
-# প্রজেক্ট ফোল্ডারে প্রবেশ করুন
-cd cnupscaler
+name: Build APK
 
-# গিট ইনিশিয়ালাইজ করুন (না করা থাকলে)
-git init
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
 
-# ফাইলগুলো স্টেজিং এরিয়াতে যোগ করুন
-git add .
+jobs:
+  build:
+    runs-on: ubuntu-latest
 
-# পরিবর্তনগুলো কমিট করুন
-git commit -m "Setup project and APK build workflow"
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
 
-# গিটহাব রিপোজিটরির মেইন ব্রাঞ্চ সেট করুন
-git branch -M main
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: gradle
 
-# আপনার গিটহাব রিপোজিটরির লিংক যোগ করুন (YOUR_USERNAME এবং REPO_NAME পরিবর্তন করুন)
-git remote add origin https://github.com/YOUR_USERNAME/REPO_NAME.git
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew || true
 
-# গিটহাবে পুশ করুন
-git push -u origin main
+    - name: Build with Gradle
+      run: ./gradlew assembleDebug
+
+    - name: Upload APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: CN-Upscaler-Debug
+        path: app/build/outputs/apk/debug/*.apk
