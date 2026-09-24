@@ -28,20 +28,25 @@ jobs:
       with:
         gradle-version: '8.2'
 
-    - name: Find Project and Build
+    - name: Extract Project Zip and Build
       run: |
-        # settings.gradle বা build.gradle যেখানে আছে সেই ডিরেক্টরি বের করা
-        CONFIG_FILE=$(find . -name "settings.gradle*" -o -name "build.gradle*" | grep -v "/app/" | head -n 1)
-        
-        if [ -n "$CONFIG_FILE" ]; then
-          TARGET_DIR=$(dirname "$CONFIG_FILE")
-        else
-          TARGET_DIR="."
+        # জিপ ফাইল আনজিপ করা
+        if [ -f "CN-Upscaler.zip" ]; then
+          echo "Extracting CN-Upscaler.zip..."
+          unzip -o CN-Upscaler.zip
+        elif [ -f "cnupscaler.zip" ]; then
+          echo "Extracting cnupscaler.zip..."
+          unzip -o cnupscaler.zip
         fi
-        
-        echo "Moving into project directory: $TARGET_DIR"
-        cd "$TARGET_DIR"
-        ls -la
+
+        # যেখানে settings.gradle বা build.gradle আছে সেই ফোল্ডার খুঁজে নেওয়া
+        PROJECT_DIR=$(find . -name "settings.gradle*" -exec dirname {} \; | head -n 1)
+        if [ -z "$PROJECT_DIR" ]; then
+          PROJECT_DIR=$(find . -name "build.gradle*" -not -path "*/app/*" -exec dirname {} \; | head -n 1)
+        fi
+
+        echo "Building inside directory: $PROJECT_DIR"
+        cd "$PROJECT_DIR"
         gradle assembleDebug --no-daemon
 
     - name: Upload APK Artifact
