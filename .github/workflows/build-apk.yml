@@ -19,19 +19,23 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v3
+      with:
+        gradle-version: '8.2'
 
-    - name: Locate Project & Build APK
+    - name: Build Debug APK
       run: |
-        echo "Searching for build.gradle..."
-        BUILD_DIR=$(find . -name "settings.gradle*" -exec dirname {} \; | head -n 1)
-        if [ -z "$BUILD_DIR" ]; then
-          BUILD_DIR="."
+        PROJECT_DIR=$(find . -name "build.gradle*" -not -path "*/app/*" -exec dirname {} \; | head -n 1)
+        if [ -z "$PROJECT_DIR" ]; then
+          PROJECT_DIR="."
         fi
-        echo "Building inside directory: $BUILD_DIR"
-        cd "$BUILD_DIR"
-        gradle assembleDebug --stacktrace
+        echo "Found project directory: $PROJECT_DIR"
+        cd "$PROJECT_DIR"
+        gradle assembleDebug --no-daemon --warning-mode all
 
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
